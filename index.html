@@ -1,0 +1,220 @@
+<html>
+    <head>
+        <title>Tock.js</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.1/css/bulma.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        <section class="hero is-medium is-primary is-bold">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title">Tock.js</h1>
+                    <h2 class="subtitle">Timer Object/Class Kickass!</h2>
+                </div>
+            </div>
+        </section>
+        <div class="section">
+            <div class="container">
+                <div class="content">
+                    <p>
+                        Tock.js is a Javascript timer library that will keep time over long durations.
+                    </p>
+                    <p>
+                        Source code and documentation is available on <a href="https://github.com/mrchimp/tock">Github</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <section class="section">
+            <div class="container">
+                <div class="columns">
+                    <div class="column">
+                        <h2 class="title">Countdown Timer</h2>
+                        <div class="field has-addons">
+                            <p class="control">
+                                <input class="input" type="text" id="countdownTime" value="00:00:10">
+                            </p>
+                            <p class="control">
+                                <button class="button" type="button" id="startCountdown">Start</button>
+                            </p>
+                            <p class="control">
+                                <button class="button" type="button" id="stopCountdown">Stop</button>
+                            </p>
+                            <p class="control">
+                                <button class="button" type="button" id="lapCountdown">Lap</button>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="box">
+                            <h3 class="subtitle is-3">
+                                <button class="button is-pulled-right" type="button" id="clearCountdown">Clear</button>
+                                Output
+                            </h3>
+                            <pre id="countdownOutput"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="section">
+            <div class="container">
+                <div class="columns">
+                    <div class="column">
+                        <h2 class="title">Count up timer</h2>
+                        <div class="field has-addons">
+                            <p class="control">
+                                <input type="text" class="input" id="countupTime" value="00:00:00">
+                            </p>
+                            <p class="control">
+                                <button class="button" type="button" id="startCountup">Start</button>
+                            </p>
+                            <p class="control">
+                                <button class="button" type="button" id="lapCountup">Lap</button>
+                            </p>
+                            <p class="control">
+                                <button class="button" type="button" id="pauseCountup">Pause</button>
+                            </p>
+                            <p class="control">
+                                <button class="button" type="button" id="resetCountup">Reset</button>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="box">
+                            <h3 class="subtitle is-3">
+                                <button class="button is-pulled-right" type="button" id="clearCountup">Clear</button>
+                                Output
+                            </h3>
+                            <pre id="countupOutput"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer class="footer">
+            <div class="container">
+                <div class="content has-text-centered">
+                    <p>
+                        <strong>Tock.js</strong> by <a href="https://deviouschimp.co.uk">Mr Chimp</a>. Source code available under the <a href="http://opensource.org/licenses/mit-license.php">MIT License.</a>
+                    </p>
+                    <p>
+                        <a href="https://github.com/mrchimp/tock" class="icon">
+                            <i class="fa fa-github"></i>
+                        </a>
+                        <a href="https://twitter.com/mr_chimp" class="icon">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocktimer/1.0.12/tock.min.js"></script>
+        <script>
+            /**
+             * Coundown Timer
+             */
+            
+            var countdownOutputEl = document.getElementById('countdownOutput');
+            var countdown_start_time;
+            
+            function countdownOutput(msg) {
+                countdownOutputEl.innerHTML = countdownOutputEl.innerHTML + msg + '\n';
+            }
+            
+            var timer1 = new Tock({
+                countdown: true,
+                interval: 1000,
+                callback: function () {
+                    var current_time_ms = timer1.lap();
+                    countdownOutput('Tick. ' + current_time_ms);
+                    var current_timecode = timer1.msToTimecode(current_time_ms, false)
+                    countdownTimeEl.value = current_timecode;
+                },
+                complete: function () {
+                    countdownOutput('Countdown complete!');
+                    var duration = Date.now() - countdown_start_time;
+                    countdownOutput('Actual time since start: ' + duration + 'ms');
+                },
+            });
+
+            var countdownTimeEl = document.getElementById('countdownTime');
+            var countdownStartButton = document.getElementById('startCountdown');
+            var countdownStopButton = document.getElementById('stopCountdown');
+            var countdownLapButton = document.getElementById('lapCountdown');
+            var countdownClearButton = document.getElementById('clearCountdown');
+
+            countdownStartButton.addEventListener('click', function (e) {
+                var val = countdownTimeEl.value;
+                countdownOutput('Starting from ' + val);
+                timer1.start(val);
+                countdown_start_time = Date.now();
+            });
+
+            countdownStopButton.addEventListener('click', function (e) {
+                timer1.stop();
+            });
+
+            countdownLapButton.addEventListener('click', function (e) {
+                countdownOutput('Current time: ' + timer1.msToTimecode(timer1.lap(), true));
+            });
+
+            countdownClearButton.addEventListener('click', function (e) {
+                countdownOutputEl.innerHTML = '';
+            });
+
+
+            /**
+             * Count Up Timer
+             */
+            var countupOutputEl = document.getElementById('countupOutput');
+            var countup_start_time;
+
+            function countupOutput(msg) {
+                countupOutputEl.innerHTML = countupOutputEl.innerHTML + msg + '\n';
+            }
+
+            var timer2 = new Tock({
+                interval: 1000,
+                callback: function () {
+                    var current_time_ms = timer2.lap();
+                    countupOutput('Tick ' + current_time_ms + 'ms');
+                    var current_timecode = timer2.msToTimecode(current_time_ms, false);
+                    countupTimeEl.value = current_timecode;
+                },
+            });
+
+            var countupTimeEl = document.getElementById('countupTime');
+            var countupStartButton = document.getElementById('startCountup');
+            var countupPauseButton = document.getElementById('pauseCountup');
+            var countupLapButton = document.getElementById('lapCountup');
+            var countupClearButton = document.getElementById('clearCountup');
+            var countupResetButton = document.getElementById('resetCountup');
+
+            countupStartButton.addEventListener('click', function (e) {
+                var val = countupTimeEl.value;
+                timer2.start();
+            });
+
+            countupResetButton.addEventListener('click', function (e) {
+                timer2.reset();
+                countupOutputEl.innerHTML = '';
+                countupTimeEl.value = '00:00:00';
+                countupOutput('Resetting to 00:00.');
+            });
+
+            countupPauseButton.addEventListener('click', function (e) {
+                timer2.pause();
+                countupOutput('Paused at ' + timer2.lap());
+            });
+
+            countupLapButton.addEventListener('click', function (e) {
+                countupOutput('Current time: ' + timer2.msToTimecode(timer2.lap(), true));
+            });
+
+            countupClearButton.addEventListener('click', function (e) {
+                countupOutputEl.innerHTML = '';
+            });
+        </script>
+    </body>
+</html>
